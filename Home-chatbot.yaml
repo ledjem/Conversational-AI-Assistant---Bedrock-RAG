@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Chatbot IA Maison - Bedrock Knowledge Base + Lambda + API Gateway - eu-west-3'
+Description: 'Chatbot IA - Bedrock Knowledge Base + Lambda + API Gateway - eu-west-3'
 
 Parameters:
   ProjectName:
     Type: String
-    Default: 'maison-chatbot'
+    Default: 'home-chatbot'
     Description: 'Nom du projet'
 
 Resources:
 
   # ============================================================
-  # S3 — Stockage des documents maison
+  # S3 — Stockage des documents
   # ============================================================
   DocumentsBucket:
     Type: AWS::S3::Bucket
@@ -127,7 +127,7 @@ Resources:
                           'modelArn': os.environ['MODEL_ID'],
                           'generationConfiguration': {
                               'promptTemplate': {
-                                  'textPromptTemplate': """Tu es l'assistant personnel de la maison.
+                                  'textPromptTemplate': """Tu es l'assistant personnel.
                                   Réponds en français, de façon concise et utile.
                                   Utilise uniquement les informations du contexte fourni.
                                   Si tu ne sais pas, dis-le clairement.
@@ -162,7 +162,7 @@ Resources:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: !Sub '${ProjectName}-api'
-      Description: 'API chatbot maison'
+      Description: 'API chatbot'
       EndpointConfiguration:
         Types:
           - REGIONAL
@@ -216,7 +216,7 @@ Resources:
 Outputs:
 
   DocumentsBucketName:
-    Description: 'Bucket S3 — déposer tes documents maison ici'
+    Description: 'Bucket S3 — déposer tes documents ici'
     Value: !Ref DocumentsBucket
 
   ApiEndpoint:
