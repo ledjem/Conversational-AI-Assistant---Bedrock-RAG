@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistant Maison</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0f1e;
+    color: #e8edf5;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .header h1 {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #4a7fa5;
+    margin-bottom: 12px;
+  }
+
+  .header h2 {
+    font-size: 32px;
+    font-weight: 300;
+    color: #e8edf5;
+    letter-spacing: -0.5px;
+  }
+
+  .orb-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin-bottom: 48px;
+    cursor: pointer;
+  }
+
+  .orb {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #2a6496, #0d3a5c, #061828);
+    box-shadow:
+      0 0 40px rgba(42, 100, 150, 0.3),
+      0 0 80px rgba(42, 100, 150, 0.15),
+      inset 0 0 40px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .orb svg {
+    width: 48px;
+    height: 48px;
+    opacity: 0.8;
+  }
+
+  .orb:hover {
+    box-shadow:
+      0 0 60px rgba(42, 100, 150, 0.5),
+      0 0 120px rgba(42, 100, 150, 0.25),
+      inset 0 0 40px rgba(0,0,0,0.4);
+    transform: scale(1.03);
+  }
+
+  .orb.listening {
+    background: radial-gradient(circle at 35% 35%, #c0392b, #7b241c, #2c0f0c);
+    box-shadow:
+      0 0 60px rgba(192, 57, 43, 0.5),
+      0 0 120px rgba(192, 57, 43, 0.25),
+      inset 0 0 40px rgba(0,0,0,0.4);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .orb.thinking {
+    background: radial-gradient(circle at 35% 35%, #8e44ad, #5b2c6f, #1a0a2e);
+    box-shadow:
+      0 0 60px rgba(142, 68, 173, 0.5),
+      0 0 120px rgba(142, 68, 173, 0.25),
+      inset 0 0 40px rgba(0,0,0,0.4);
+    animation: spin-glow 2s linear infinite;
+  }
+
+  .orb.speaking {
+    background: radial-gradient(circle at 35% 35%, #27ae60, #1a6b3c, #071e12);
+    box-shadow:
+      0 0 60px rgba(39, 174, 96, 0.5),
+      0 0 120px rgba(39, 174, 96, 0.25),
+      inset 0 0 40px rgba(0,0,0,0.4);
+    animation: pulse 0.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+
+  @keyframes spin-glow {
+    0% { box-shadow: 0 0 60px rgba(142, 68, 173, 0.5), 0 -40px 60px rgba(142, 68, 173, 0.3), inset 0 0 40px rgba(0,0,0,0.4); }
+    25% { box-shadow: 40px 0 60px rgba(142, 68, 173, 0.5), 0 0 60px rgba(142, 68, 173, 0.3), inset 0 0 40px rgba(0,0,0,0.4); }
+    50% { box-shadow: 0 0 60px rgba(142, 68, 173, 0.5), 0 40px 60px rgba(142, 68, 173, 0.3), inset 0 0 40px rgba(0,0,0,0.4); }
+    75% { box-shadow: -40px 0 60px rgba(142, 68, 173, 0.5), 0 0 60px rgba(142, 68, 173, 0.3), inset 0 0 40px rgba(0,0,0,0.4); }
+    100% { box-shadow: 0 0 60px rgba(142, 68, 173, 0.5), 0 -40px 60px rgba(142, 68, 173, 0.3), inset 0 0 40px rgba(0,0,0,0.4); }
+  }
+
+  .status {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a7fa5;
+    margin-bottom: 32px;
+    height: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .transcript-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px 24px;
+    width: 100%;
+    max-width: 480px;
+    min-height: 60px;
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #b0bec5;
+  }
+
+  .transcript-box.question {
+    border-color: rgba(42, 100, 150, 0.3);
+    color: #e8edf5;
+  }
+
+  .transcript-box.answer {
+    border-color: rgba(39, 174, 96, 0.3);
+    color: #a8d8b0;
+    font-size: 14px;
+  }
+
+  .label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a7fa5;
+    margin-bottom: 8px;
+  }
+
+  .api-config {
+    margin-top: 32px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .api-config input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #e8edf5;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .api-config input:focus {
+    border-color: rgba(42, 100, 150, 0.5);
+  }
+
+  .api-config input::placeholder {
+    color: #4a5568;
+  }
+
+  .hint {
+    margin-top: 12px;
+    font-size: 11px;
+    color: #4a5568;
+    text-align: center;
+  }
+
+  .error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Domèvre-sur-Vezouze</h1>
+  <h2>Assistant Maison</h2>
+</div>
+
+<div class="orb-container" onclick="toggleListen()">
+  <div class="orb" id="orb">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="23"/>
+      <line x1="8" y1="23" x2="16" y2="23"/>
+    </svg>
+  </div>
+</div>
+
+<div class="status" id="status">Appuie pour parler</div>
+
+<div style="width:100%;max-width:480px;">
+  <div class="label" id="q-label" style="display:none">Tu as dit</div>
+  <div class="transcript-box question" id="question-box" style="display:none"></div>
+
+  <div class="label" id="a-label" style="display:none;margin-top:16px">Réponse</div>
+  <div class="transcript-box answer" id="answer-box" style="display:none"></div>
+</div>
+
+<div class="api-config">
+  <div class="label">URL de ton API</div>
+  <input type="text" id="api-url" placeholder="https://xxxxxxxx.execute-api.eu-west-3.amazonaws.com/prod/chat" />
+  <div class="hint">Récupère l'URL avec : aws cloudformation describe-stacks --stack-name maison-chatbot --region eu-west-3 --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' --output text</div>
+  <div class="error" id="error-msg"></div>
+</div>
+
+<script>
+  let recognition = null;
+  let isListening = false;
+  const orb = document.getElementById('orb');
+  const status = document.getElementById('status');
+  const questionBox = document.getElementById('question-box');
+  const answerBox = document.getElementById('answer-box');
+  const errorMsg = document.getElementById('error-msg');
+
+  function setStatus(text, state) {
+    status.textContent = text;
+    orb.className = 'orb ' + (state || '');
+  }
+
+  function showQuestion(text) {
+    document.getElementById('q-label').style.display = 'block';
+    questionBox.style.display = 'block';
+    questionBox.textContent = text;
+  }
+
+  function showAnswer(text) {
+    document.getElementById('a-label').style.display = 'block';
+    answerBox.style.display = 'block';
+    answerBox.textContent = text;
+  }
+
+  function speak(text) {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'fr-FR';
+    utt.rate = 1.0;
+    utt.pitch = 1.0;
+
+    // Cherche une voix française
+    const voices = synth.getVoices();
+    const frVoice = voices.find(v => v.lang.startsWith('fr'));
+    if (frVoice) utt.voice = frVoice;
+
+    setStatus('En train de répondre...', 'speaking');
+    utt.onend = () => setStatus('Appuie pour parler', '');
+    synth.speak(utt);
+  }
+
+  async function askQuestion(question) {
+    const apiUrl = document.getElementById('api-url').value.trim();
+    if (!apiUrl) {
+      errorMsg.textContent = 'Entre l\'URL de ton API ci-dessous';
+      setStatus('Appuie pour parler', '');
+      return;
+    }
+    errorMsg.textContent = '';
+
+    setStatus('Réflexion...', 'thinking');
+    showQuestion(question);
+    answerBox.style.display = 'none';
+    document.getElementById('a-label').style.display = 'none';
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await res.json();
+      const answer = data.answer || data.error || 'Pas de réponse';
+      showAnswer(answer);
+      speak(answer);
+    } catch (err) {
+      errorMsg.textContent = 'Erreur API : ' + err.message;
+      setStatus('Appuie pour parler', '');
+    }
+  }
+
+  function toggleListen() {
+    if (isListening) {
+      recognition && recognition.stop();
+      return;
+    }
+
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      errorMsg.textContent = 'Ton navigateur ne supporte pas la reconnaissance vocale. Utilise Chrome.';
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      isListening = true;
+      setStatus('Écoute...', 'listening');
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      isListening = false;
+      askQuestion(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      isListening = false;
+      setStatus('Appuie pour parler', '');
+      errorMsg.textContent = 'Erreur micro : ' + event.error;
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+    };
+
+    recognition.start();
+  }
+
+  // Charger les voix
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
