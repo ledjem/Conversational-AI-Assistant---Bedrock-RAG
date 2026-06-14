@@ -100,8 +100,8 @@ CloudFormation Stack
 
 ```bash
 aws cloudformation deploy \
-  --template-file maison-chatbot.yaml \
-  --stack-name maison-chatbot \
+  --template-file home-chatbot.yaml \
+  --stack-name xxxxxxxx \
   --region eu-west-3 \
   --capabilities CAPABILITY_NAMED_IAM
 ```
@@ -111,7 +111,7 @@ aws cloudformation deploy \
 ```bash
 aws s3 cp your-document.docx \
   s3://$(aws cloudformation describe-stacks \
-    --stack-name maison-chatbot \
+    --stack-name xxxxxxxx \
     --region eu-west-3 \
     --query 'Stacks[0].Outputs[?OutputKey==`DocumentsBucketName`].OutputValue' \
     --output text)/
@@ -127,7 +127,7 @@ aws s3 cp your-document.docx \
 
 ```bash
 aws lambda update-function-configuration \
-  --function-name maison-chatbot-chatbot \
+  --function-name xxxxxxx-chatbot \  #Replace xxxxxx with good name
   --region eu-west-3 \
   --environment "Variables={KNOWLEDGE_BASE_ID=YOUR_KB_ID,MODEL_ID=eu.anthropic.claude-haiku-4-5-20251001-v1:0}"
 ```
@@ -155,9 +155,9 @@ curl -X POST https://YOUR_API_ID.execute-api.eu-west-3.amazonaws.com/prod/chat \
 ## Repository Structure
 
 ```
-├── maison-chatbot.yaml          # CloudFormation template
-├── assistant-maison.html        # Web interface (Chrome)
-├── architecture-assistant-maison.drawio  # Architecture diagram
+├── home-chatbot.yaml          # CloudFormation template
+├── web-assistant.html        # Web interface (Chrome)
+├── architecture-assistant.drawio  # Architecture diagram
 └── README.md
 ```
 
